@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,19 +18,23 @@
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
  *
  */
+
 namespace oat\taoWorkspace\scripts\uninstall;
 
+use common_ext_action_InstallAction;
+use common_exception_InconsistentData;
+use common_report_Report;
 use oat\taoWorkspace\model\lockStrategy\LockSystem;
 use oat\generis\model\data\ModelManager;
 use oat\taoWorkspace\model\generis\WrapperModel;
 use oat\taoRevision\model\Repository;
 use oat\taoWorkspace\model\RevisionWrapper;
-use \oat\tao\model\lock\LockSystem as LockSystemInterface;
+use oat\tao\model\lock\LockSystem as LockSystemInterface;
 use oat\tao\model\lock\implementation\NoLock;
 use oat\taoWorkspace\model\lockStrategy\SqlStorage;
 use oat\generis\model\OntologyAwareTrait;
 
-class UninstallWorkspace extends \common_ext_action_InstallAction
+class UninstallWorkspace extends InstallAction
 {
     use OntologyAwareTrait;
 
@@ -37,17 +42,23 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
     {
         $lock = $this->getServiceManager()->get(LockSystemInterface::SERVICE_ID)->getConfig();
         if (!$lock instanceof LockSystem) {
-            throw new \common_exception_InconsistentData('Expected Workspace Lock not found, found '.get_class($lock));
+            throw new InconsistentData(
+                'Expected Workspace Lock not found, found ' . get_class($lock)
+            );
         }
 
         $model = ModelManager::getModel();
         if (!$model instanceof WrapperModel) {
-            throw new \common_exception_InconsistentData('Expected Ontology Wrapper not found, found '.get_class($model));
+            throw new InconsistentData(
+                'Expected Ontology Wrapper not found, found ' . get_class($model)
+            );
         }
 
         $repositoryStore = $this->getServiceManager()->get(Repository::SERVICE_ID);
         if (!$repositoryStore instanceof RevisionWrapper) {
-            throw new \common_exception_InconsistentData('Expected Revision Wrapper not found, found '.get_class($repositoryStore));
+            throw new InconsistentData(
+                'Expected Revision Wrapper not found, found ' . get_class($repositoryStore)
+            );
         }
 
         $this->releaseAll($lock);
@@ -64,7 +75,8 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
 
         $this->registerService(LockSystemInterface::SERVICE_ID, new NoLock());
         $storageSql->exec('DROP TABLE workspace');
-        return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Successfully removed workspace wrappers'));
+
+        return new Report(Report::TYPE_SUCCESS, __('Successfully removed workspace wrappers'));
     }
 
     /**
@@ -76,14 +88,18 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
     {
         $sql = $lockService->getStorage()->getPersistence();
 
-        $result = $sql->query('SELECT '.SqlStorage::FIELD_OWNER.','.SqlStorage::FIELD_RESOURCE.' FROM '.SqlStorage::TABLE_NAME);
+        $query = 'SELECT ' . SqlStorage::FIELD_OWNER . ', ' . SqlStorage::FIELD_RESOURCE . ' FROM '
+            . SqlStorage::TABLE_NAME;
+        $result = $sql->query($query);
         $locked = $result->fetchAllAssociative();
         foreach ($locked as $data) {
             try {
                 $resource = $this->getResource($data[SqlStorage::FIELD_RESOURCE]);
                 $lockService->releaseLock($resource, $data[SqlStorage::FIELD_OWNER]);
             } catch (\Exception $e) {
-                \common_Logger::w('Failed to release resource '.$data[SqlStorage::FIELD_RESOURCE].': '.$e->getMessage());
+                \common_Logger::w(
+                    'Failed to release resource ' . $data[SqlStorage::FIELD_RESOURCE] . ': ' . $e->getMessage()
+                );
             }
         }
     }
