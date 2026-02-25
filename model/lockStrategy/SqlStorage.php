@@ -79,7 +79,7 @@ class SqlStorage extends ConfigurableService
         $result	= $persistence->query($query, array($userId));
         
         $map = array();
-        while ($row = $result->fetch()) {
+        while (($row = $result->fetchAssociative()) !== false) {
             $map[$row[self::FIELD_RESOURCE]] = $row[self::FIELD_WORKCOPY];
         }
         return $map;
@@ -108,7 +108,7 @@ class SqlStorage extends ConfigurableService
         $result	= static::getPersistence()->query($query, array($resource->getUri()));
         
         $locks = array();
-        while ($row = $result->fetch()) {
+        while (($row = $result->fetchAssociative()) !== false) {
             $locks[] = new Lock(
                 new core_kernel_classes_Resource($row[self::FIELD_RESOURCE])
                 , $row[self::FIELD_OWNER]

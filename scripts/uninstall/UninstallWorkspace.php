@@ -77,7 +77,7 @@ class UninstallWorkspace extends \common_ext_action_InstallAction
         $sql = $lockService->getStorage()->getPersistence();
 
         $result = $sql->query('SELECT '.SqlStorage::FIELD_OWNER.','.SqlStorage::FIELD_RESOURCE.' FROM '.SqlStorage::TABLE_NAME);
-        $locked = $result->fetchAll(\PDO::FETCH_ASSOC);
+        $locked = $result->fetchAllAssociative();
         foreach ($locked as $data) {
             try {
                 $resource = $this->getResource($data[SqlStorage::FIELD_RESOURCE]);
