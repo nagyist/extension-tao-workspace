@@ -93,7 +93,8 @@ class SqlStorage extends ConfigurableService
     {
         $persistence = self::getPersistence();
         $query = 'INSERT INTO "' . self::TABLE_NAME . '" ("' . self::FIELD_OWNER . '", "'
-            . self::FIELD_RESOURCE . '", "' . self::FIELD_WORKCOPY . '", "' . self::FIELD_CREATED . '") VALUES (?,?,?,?)';
+            . self::FIELD_RESOURCE . '", "' . self::FIELD_WORKCOPY . '", "' . self::FIELD_CREATED . '") '
+            . 'VALUES (?,?,?,?)';
         $result = $persistence->exec($query, [$userId, $resource->getUri(), $copy->getUri(), time()]);
     }
 
