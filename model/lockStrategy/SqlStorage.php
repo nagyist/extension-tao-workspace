@@ -80,7 +80,7 @@ class SqlStorage extends ConfigurableService
     public static function getMap($userId)
     {
         $persistence = self::getPersistence();
-        $query = 'SELECT * FROM ' . self::TABLE_NAME . ' WHERE ' . self::FIELD_OWNER . ' = ?';
+        $query = 'SELECT * FROM "' . self::TABLE_NAME . '" WHERE "' . self::FIELD_OWNER . '" = ?';
         $result = $persistence->query($query, [$userId]);
 
         $map = [];
@@ -115,7 +115,7 @@ class SqlStorage extends ConfigurableService
      */
     public function getLock(core_kernel_classes_Resource $resource)
     {
-        $query = 'SELECT * FROM ' . self::TABLE_NAME . ' WHERE ' . self::FIELD_RESOURCE . ' = ?';
+        $query = 'SELECT * FROM "' . self::TABLE_NAME . '" WHERE "' . self::FIELD_RESOURCE . '" = ?';
         $result = static::getPersistence()->query($query, [$resource->getUri()]);
 
         $locks = [];
@@ -134,6 +134,6 @@ class SqlStorage extends ConfigurableService
             );
         }
 
-        return count($locks) == 1 ? reset($locks) : null;
+        return count($locks) === 1 ? reset($locks) : null;
     }
 }
