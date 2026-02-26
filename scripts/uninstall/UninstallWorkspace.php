@@ -35,6 +35,7 @@ use oat\tao\model\lock\LockSystem as LockSystemInterface;
 use oat\tao\model\lock\implementation\NoLock;
 use oat\taoWorkspace\model\lockStrategy\SqlStorage;
 use oat\generis\model\OntologyAwareTrait;
+use Throwable;
 
 class UninstallWorkspace extends InstallAction
 {
@@ -92,8 +93,13 @@ class UninstallWorkspace extends InstallAction
 
         $query = 'SELECT ' . SqlStorage::FIELD_OWNER . ', ' . SqlStorage::FIELD_RESOURCE . ' FROM '
             . SqlStorage::TABLE_NAME;
-        $result = $sql->query($query);
-        $locked = $result->fetchAllAssociative();
+        try {
+            $result = $sql->query($query);
+            $locked = $result->fetchAllAssociative();
+        } catch (Throwable $e) {
+            \common_Logger::w('Skipping workspace lock cleanup: ' . $e->getMessage());
+            return;
+        }
         foreach ($locked as $data) {
             try {
                 $resource = $this->getResource($data[SqlStorage::FIELD_RESOURCE]);
