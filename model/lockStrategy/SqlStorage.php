@@ -97,7 +97,7 @@ class SqlStorage extends ConfigurableService
         $query = 'INSERT INTO "' . self::TABLE_NAME . '" ("' . self::FIELD_OWNER . '", "'
             . self::FIELD_RESOURCE . '", "' . self::FIELD_WORKCOPY . '", "' . self::FIELD_CREATED . '") '
             . 'VALUES (?,?,?,?)';
-        $result = $persistence->exec($query, [$userId, $resource->getUri(), $copy->getUri(), time()]);
+        $persistence->exec($query, [$userId, $resource->getUri(), $copy->getUri(), time()]);
     }
 
     public static function remove(Lock $lock)
@@ -105,7 +105,7 @@ class SqlStorage extends ConfigurableService
         $persistence = self::getPersistence();
         $query = 'DELETE FROM "' . self::TABLE_NAME . '" WHERE "' . self::FIELD_OWNER . '" = ? AND "'
             . self::FIELD_RESOURCE . '" = ?';
-        $result = $persistence->exec($query, [$lock->getOwnerId(), $lock->getResource()->getUri()]);
+        $persistence->exec($query, [$lock->getOwnerId(), $lock->getResource()->getUri()]);
     }
 
     /**

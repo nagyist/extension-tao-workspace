@@ -19,11 +19,13 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace oat\taoWorkspace\scripts\uninstall;
 
-use common_ext_action_InstallAction;
-use common_exception_InconsistentData;
-use common_report_Report;
+use common_ext_action_InstallAction as InstallAction;
+use common_exception_InconsistentData as InconsistentData;
+use common_report_Report as Report;
 use oat\taoWorkspace\model\lockStrategy\LockSystem;
 use oat\generis\model\data\ModelManager;
 use oat\taoWorkspace\model\generis\WrapperModel;
@@ -74,7 +76,7 @@ class UninstallWorkspace extends InstallAction
         $storageSql = $lock->getStorage()->getPersistence();
 
         $this->registerService(LockSystemInterface::SERVICE_ID, new NoLock());
-        $storageSql->exec('DROP TABLE workspace');
+        $storageSql->exec('DROP TABLE IF EXISTS ' . SqlStorage::TABLE_NAME);
 
         return new Report(Report::TYPE_SUCCESS, __('Successfully removed workspace wrappers'));
     }
